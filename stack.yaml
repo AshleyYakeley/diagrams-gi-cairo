@@ -1,0 +1,14 @@
+packages:
+- .
+
+resolver: lts-16.15
+compiler: ghc-8.10.2
+
+allow-newer: true
+
+extra-deps:
+- lens-4.19.2
+- cairo-0.13.8.1
+- pango-0.13.8.1
+- glib-0.13.8.1
+- gtk2hs-buildtools-0.13.8.0
