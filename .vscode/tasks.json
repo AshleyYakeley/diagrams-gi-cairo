@@ -1,0 +1,108 @@
+
+{
+  // Automatically created by phoityne-vscode extension.
+
+  "version": "2.0.0",
+  "presentation": {
+    "echo": true,
+    "reveal": "always",
+    "focus": false,
+    "panel": "shared",
+    "showReuseMessage": false,
+    "clear": true
+  },
+  "tasks": [
+    {
+      // F7
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "label": "stack build",
+      "type": "shell",
+      "command": "stack build",
+      "problemMatcher": [
+        {
+          "owner": "stack",
+          "fileLocation": "absolute",
+          "pattern": [
+            {
+              "regexp": "(.*):(\\d+):(\\d+):\\s+(warning|error):",
+              "file": 1,
+              "line": 2,
+              "column": 3,
+              "severity": 4
+            },
+            {
+              "regexp": "\\s+(.*)$",
+              "message": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      // F6
+      "group": "build",
+      "type": "shell",
+      "label": "stack clean & build",
+      "command": "stack clean && stack build",
+      //"command": "stack clean ; stack build",  // for powershell
+      "problemMatcher": [
+        {
+          "owner": "stack",
+          "fileLocation": "absolute",
+          "pattern": [
+            {
+              "regexp": "(.*):(\\d+):(\\d+):\\s+(warning|error):",
+              "file": 1,
+              "line": 2,
+              "column": 3,
+              "severity": 4
+            },
+            {
+              "regexp": "\\s+(.*)$",
+              "message": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      // F8
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "type": "shell",
+      "label": "stack test",
+      "command": "stack test",
+      "problemMatcher": [
+        {
+          "owner": "stack",
+          "fileLocation": "absolute",
+          "pattern": [
+            {
+              "regexp": "(.*):(\\d+):(\\d+):\\s+(warning|error):",
+              "file": 1,
+              "line": 2,
+              "column": 3,
+              "severity": 4
+            },
+            {
+              "regexp": "\\s+(.*)$",
+              "message": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      // F6
+      "isBackground": true,
+      "type": "shell",
+      "label": "stack watch",
+      "command": "stack build --test --no-run-tests --file-watch"
+    }
+  ]
+}
