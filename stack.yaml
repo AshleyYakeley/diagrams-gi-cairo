@@ -1,11 +1,18 @@
 packages:
 - .
 
-resolver: lts-16.15
-compiler: ghc-8.10.2
+resolver: lts-17.0
 
 allow-newer: true
 
 extra-deps:
-- lens-4.19.2
+- diagrams-core-1.4.2
+- diagrams-lib-1.4.3
+- statestack-0.3
 - gi-pangocairo-1.0.24
+- active-0.2.0.14
+- dual-tree-0.2.2.1
+- monoid-extras-0.5.1
+
+ghc-options:
+    "$locals": -Werror

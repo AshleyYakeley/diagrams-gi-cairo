@@ -11,6 +11,7 @@
 {-# LANGUAGE TypeFamilies              #-}
 {-# LANGUAGE TypeSynonymInstances      #-}
 {-# LANGUAGE ViewPatterns              #-}
+{-# OPTIONS -fno-warn-incomplete-uni-patterns #-}
 
 -----------------------------------------------------------------------------
 -- |
