@@ -23,7 +23,7 @@ import           Foreign.Marshal.Alloc           (finalizerFree)
 import           Foreign.Marshal.Array           (mallocArray, pokeArray)
 import           Foreign.Ptr                     (Ptr, castPtr)
 
-import           Graphics.Rendering.Cairo        (Format (..),
+import           GI.Cairo.Render                 (Format (..),
                                                   formatStrideForWidth,
                                                   renderWith,
                                                   withImageSurfaceForData)

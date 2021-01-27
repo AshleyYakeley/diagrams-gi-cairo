@@ -1,3 +1,6 @@
+{-# LANGUAGE ViewPatterns              #-}
+
+-----------------------------------------------------------------------------
 -- |
 -- Module      :  Diagrams.Backend.Cairo.Text
 -- Copyright   :  (c) 2015 Diagrams-cairo team (see LICENSE)
@@ -35,8 +38,8 @@ import qualified Diagrams.BoundingBox            as BB
 import           Diagrams.Prelude                hiding (height, view)
 import           Diagrams.TwoD.Text              hiding (font)
 
-import qualified Graphics.Rendering.Cairo        as C
-import qualified Graphics.Rendering.Pango        as P
+import qualified GI.Cairo.Render                 as C
+import qualified GI.Pango                        as P
 
 import           System.IO.Unsafe
 
@@ -62,9 +65,13 @@ textVisualBoundedIO = textLineIO snd
 
 -- | Abstract common code from @textLineBoundedIO@ and @textVisualBoundedIO@
 -- textLineIO :: ((a,a) -> a) -> Style V2 Double -> Text Double -> IO (Diagram Cairo)
-textLineIO :: ((P.PangoRectangle,P.PangoRectangle) -> P.PangoRectangle) -> Style V2 Double -> Text Double -> IO (Diagram Cairo)
+textLineIO :: ((P.Rectangle,P.Rectangle) -> P.Rectangle) -> Style V2 Double -> Text Double -> IO (Diagram Cairo)
 textLineIO pick sty txt = do
     layout <- queryCairo $ layoutStyledText sty txt
-    P.PangoRectangle x y  w h <- pick <$> P.layoutGetExtents layout
+    prect <- pick <$> P.layoutGetExtents layout
+    (realToFrac -> x) <- P.getRectangleX prect
+    (realToFrac -> y) <- P.getRectangleY prect
+    (realToFrac -> w) <- P.getRectangleWidth prect
+    (realToFrac -> h) <- P.getRectangleHeight prect
     let bb = BB.fromCorners (mkP2 x y) (mkP2 (x + w) (y + h))
     return $ mkQD (Prim txt) (getEnvelope bb) mempty mempty mempty

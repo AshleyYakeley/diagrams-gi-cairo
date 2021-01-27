@@ -35,7 +35,7 @@
 --
 -- The types of all the @fromX@ functions look funny in the Haddock
 -- output, which displays them like @Type -> Type@.  In fact they are
--- all of the form @Type -> Graphics.Rendering.Cairo.Type@, /i.e./
+-- all of the form @Type -> GI.Cairo.Type@, /i.e./
 -- they convert from a diagrams type to a cairo type of the same name.
 -----------------------------------------------------------------------------
 module Diagrams.Backend.Cairo.Internal where
@@ -49,9 +49,11 @@ import           Diagrams.TwoD.Adjust            (adjustDia2D,
 import           Diagrams.TwoD.Path              (Clip (Clip), getFillRule)
 import           Diagrams.TwoD.Text              hiding (font)
 
-import qualified Graphics.Rendering.Cairo        as C
-import qualified Graphics.Rendering.Cairo.Matrix as CM
-import qualified Graphics.Rendering.Pango        as P
+import qualified GI.Cairo.Render                 as C
+import qualified GI.Cairo.Render.Matrix          as CM
+import qualified GI.Cairo.Render.Connector       as C
+import qualified GI.Pango                        as P
+import qualified GI.PangoCairo                   as P
 
 import           Codec.Picture
 import           Codec.Picture.Types             (convertImage, packPixel,
@@ -73,6 +75,7 @@ import           Data.Tree
 import           Data.Typeable
 import           Data.Word                       (Word32)
 import           GHC.Generics                    (Generic)
+import           Data.Text                       (pack)
 
 -- | This data declaration is simply used as a token to distinguish
 --   the cairo backend: (1) when calling functions where the type
@@ -126,7 +129,7 @@ instance Default CairoState where
         }
 
 -- | The custom monad in which intermediate drawing options take
---   place; 'Graphics.Rendering.Cairo.Render' is cairo's own rendering
+--   place; 'GI.Cairo.Render' is cairo's own rendering
 --   monad.
 type RenderM a = SS.StateStackT CairoState C.Render a
 
@@ -255,7 +258,7 @@ cairoStyle s =
         lDashing (getDashing -> Dashing ds offs) =
           liftC $ C.setDash ds offs
 
-fromFontSlant :: FontSlant -> P.FontStyle
+fromFontSlant :: FontSlant -> P.Style
 fromFontSlant FontSlantNormal   = P.StyleNormal
 fromFontSlant FontSlantItalic   = P.StyleItalic
 fromFontSlant FontSlantOblique  = P.StyleOblique
@@ -479,11 +482,12 @@ instance Renderable (Text Double) Cairo where
       -- C.setLineWidth 0.5 -- XXX Debugging
       -- C.stroke -- XXX Debugging
       -- C.newPath -- XXX Debugging
-      P.showLayout layout
+      context <- C.getContext
+      P.showLayout context layout
       C.newPath
     restore
 
-layoutStyledText :: Style V2 Double -> Text Double -> C.Render P.PangoLayout
+layoutStyledText :: Style V2 Double -> Text Double -> C.Render P.Layout
 layoutStyledText sty (Text tt al str) =
   let tr = tt <> reflectionY
       styAttr :: AttributeClass a => (a -> b) -> Maybe b
@@ -493,12 +497,14 @@ layoutStyledText sty (Text tt al str) =
       fw = styAttr fromFontWeight
       size' = styAttr getFontSize
   in do
+    context <- C.getContext
     cairoTransf tr -- non-uniform scale
-    layout <- P.createLayout str
+    layout <- P.createLayout context
+    P.layoutSetText layout (pack str) (-1)
     -- set font, including size
     liftIO $ do
       font <- P.fontDescriptionNew
-      if' (P.fontDescriptionSetFamily font) ff
+      if' (P.fontDescriptionSetFamily font) $ fmap pack ff
       if' (P.fontDescriptionSetStyle font) fs
       if' (P.fontDescriptionSetWeight font) fw
       if' (P.fontDescriptionSetSize font) size'
@@ -506,12 +512,14 @@ layoutStyledText sty (Text tt al str) =
     -- geometric translation
     ref <- liftIO $ case al of
       BoxAlignedText xt yt -> do
-        (_,P.PangoRectangle _ _ w h) <- P.layoutGetExtents layout
+        (_,prect) <- P.layoutGetExtents layout
+        (realToFrac -> w) <- P.getRectangleWidth prect
+        (realToFrac -> h) <- P.getRectangleHeight prect
         return $ r2 (w * xt, h * (1 - yt))
       BaselineText -> do
-        baseline <- P.layoutIterGetBaseline =<< P.layoutGetIter layout
+        (realToFrac -> baseline) <- P.layoutIterGetBaseline =<< P.layoutGetIter layout
         return $ r2 (0, baseline)
     let t = moveOriginBy ref mempty :: T2 Double
     cairoTransf t
-    P.updateLayout layout
+    P.updateLayout context layout
     return layout

@@ -45,13 +45,13 @@
 -- >          }
 --
 -- @
--- type family Result Cairo V2 Double = (IO (), 'Graphics.Rendering.Cairo.Render' ())
+-- type family Result Cairo V2 Double = (IO (), 'GI.Cairo.Render' ())
 -- @
 --
 -- So the type of 'renderDia' resolves to
 --
 -- @
--- renderDia :: Cairo -> Options Cairo V2 Double -> QQDiagram Cairo V2 Double Any m -> (IO (), 'Graphics.Rendering.Cairo.Render' ())
+-- renderDia :: Cairo -> Options Cairo V2 Double -> QQDiagram Cairo V2 Double Any m -> (IO (), 'GI.Cairo.Render' ())
 -- @
 --
 -- which you could call like so:

@@ -1,4 +1,4 @@
-Name:                diagrams-cairo
+Name:                diagrams-gi-cairo
 Version:             1.4.1.1
 Synopsis:            Cairo backend for diagrams drawing EDSL
 Description:         A full-featured backend for rendering
@@ -54,12 +54,16 @@ Library
                        Diagrams.Backend.Cairo.Text
   Hs-source-dirs:      src
   Build-depends:       base >= 4.2 && < 4.14,
+                       text,
                        mtl >= 2.0 && < 2.3,
                        filepath,
                        diagrams-core >= 1.3 && < 1.5,
                        diagrams-lib >= 1.3 && < 1.5,
-                       cairo >= 0.12.4 && < 0.14,
-                       pango >= 0.12.5  && < 0.14,
+                       gi-cairo,
+                       gi-cairo-render,
+                       gi-cairo-connector,
+                       gi-pango,
+                       gi-pangocairo,
                        colour,
                        split >= 0.1.2 && < 0.3,
                        containers >= 0.3 && < 0.7,
